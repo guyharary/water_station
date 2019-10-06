@@ -7,7 +7,7 @@ import time
 
 
 # DATA
-BUFFSIZE = 1024
+BUFFSIZE = 2048
 
 
 # SQL_QUERYIES
