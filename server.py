@@ -1,5 +1,5 @@
 #IMPORTS
-import sqlite3 as sqlsh
+import sqlite3 as sql
 #from socket import *
 import datetime
 import socket
