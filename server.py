@@ -1,5 +1,5 @@
 #IMPORTS
-import sqlite3 as sql
+import sqlite3 as sqlsh
 #from socket import *
 import datetime
 import socket
@@ -7,7 +7,7 @@ import time
 
 
 # DATA
-BUFFSIZE = 1024
+BUFFSIZE = 2048
 
 
 # SQL_QUERYIES
