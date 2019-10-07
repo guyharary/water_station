@@ -52,19 +52,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(data)
             if not data:
                 s.listen()
+                #socket.setblocking(False) --> trying to keep the loop alive without exiting.
                 print("No data")
-                #break
+
             conn.sendall(data.encode())
             x = data.split()
             id = (x[0])
             alarm1 = (x[1])
             alarm2 = (x[2])
-            last_date = [''.join(x[3])]
+            last_date = [''.join(x[3])]  #last_date = [''.join(x[3:])] should join two last indexes - doesn't work
             #test_list[5: 8] = [''.join(test_list[5: 8])]
 
             with sql.connect(db_file) as conn:
-                #conn.execute(q, (x[0], x[1], x[2], x[3:]))
-                conn.execute(q, (id, alarm1, alarm2, last_date)) # this line drops the code after executing
+                conn.execute(q, (x[0], x[1], x[2], x[3]))
+                #conn.execute(q, (id, alarm1, alarm2, last_date)) # this line drops the code after executing
                                                                  # comes back to line 50. need to create a loop.
 
 
@@ -74,16 +75,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
 
 
+#EXTRA HELP:
 
-
-
-
-
-
-
-
-
-
+# def set_keepalive_linux(sock, after_idle_sec=1, interval_sec=3, max_fails=5):
+#     """Set TCP keepalive on an open socket.
+#
+#     It activates after 1 second (after_idle_sec) of idleness,
+#     then sends a keepalive ping once every 3 seconds (interval_sec),
+#     and closes the connection after 5 failed ping (max_fails), or 15 seconds
+#     """
+#     sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+#     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, after_idle_sec)
+#     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, interval_sec)
+#     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, max_fails)
 
 
 
@@ -100,16 +104,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
 
 
-
-
-
-
-
-
-
-
-
-#sql_insert_water_station = """
-#INSERT INTO STUDENT VALUES
-#(?, ?, ?, ?);
-#"""
