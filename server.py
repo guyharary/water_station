@@ -60,7 +60,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             id = (x[0])
             alarm1 = (x[1])
             alarm2 = (x[2])
-            last_date = [''.join(x[3])]  #last_date = [''.join(x[3:])] should join two last indexes - doesn't work
+            last_date = x[3] + "" + x[4]
+            #last_date = [''.join(x[3])]  #last_date = [''.join(x[3:])] should join two last indexes - doesn't work
             #test_list[5: 8] = [''.join(test_list[5: 8])]
 
             with sql.connect(db_file) as conn:
