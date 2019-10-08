@@ -52,21 +52,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(data)
             if not data:
                 s.listen()
-                #socket.setblocking(False) --> trying to keep the loop alive without exiting.
                 print("No data")
-
+            # socket.setblocking(False) --> trying to keep the loop alive without exiting.
             conn.sendall(data.encode())
             x = data.split()
             id = (x[0])
             alarm1 = (x[1])
             alarm2 = (x[2])
-            last_date = [''.join(x[3])]  #last_date = [''.join(x[3:])] should join two last indexes - doesn't work
-            #test_list[5: 8] = [''.join(test_list[5: 8])]
+            last_date = (x[3] + " " + x[4])
+            print(last_date)
 
             with sql.connect(db_file) as conn:
-                conn.execute(q, (x[0], x[1], x[2], x[3]))
-                #conn.execute(q, (id, alarm1, alarm2, last_date)) # this line drops the code after executing
-                                                                 # comes back to line 50. need to create a loop.
+                conn.execute(q, (x[0], x[1], x[2], (x[3] + " " + x[4])))
+
 
 
 
@@ -102,5 +100,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 # will print from character at index 1 up to the character at index 3 not including.
 # so it will print: tr
 
-
+#socket.setblocking(False) --> trying to keep the loop alive without exiting.
 
