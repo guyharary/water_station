@@ -13,10 +13,8 @@ with open("station_status.txt") as f:
   #print(datetime.datetime.now().strftime('%Y-%M-%d %H:%m'))
 
 
-
-
 HOST = '127.0.0.1'          # The server's hostname or IP address
-PORT = 54321       # The port used by the server
+PORT = 54322       # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
@@ -26,6 +24,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         data = data.decode()
         print('Received', repr(data))
         time.sleep(2)
+        #input()
 
 
 
