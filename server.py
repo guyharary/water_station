@@ -32,43 +32,59 @@ values (?, ?, ?, ?)
 with sql.connect(db_file) as sql_conn:
     sql_conn.execute(sql_create_table_water_station)
 
-HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
+HOST = ''  # Standard loopback interface address (localhost)
 PORT = 54322        # Port to listen on
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     s.listen(5)
+    s.settimeout(3)
+    client_list = []
     print("Waiting for connection...")
 
-    try:
-        conn, addr = s.accept()
-    except OSError:
-        pass
-    else:
-        with conn:
-            print('Connection established via: ', addr)
-            while True:
-                #conn1.sleep(3)
-                try:
-                    data = conn.recv(BUFFSIZE)
-                except OSError:
-                    pass
-                else:
-                    data = data.decode()
-                    print(data)
-                if not data:
-                    print("No data")
+    while True:
+        conn = None
+        try:
+            conn, addr = s.accept()
+            client_list.append(conn)
+        except socket.timeout:                                   #except OSError:
+            print("no connection timeout")                           #pass
+        except:
+            print("connection error")
 
-                conn.send(data.encode())
-                x = data.split()
-                print(x)
-                id = (x[0])
-                alarm1 = (x[1])
-                alarm2 = (x[2])
-                last_date = (x[3] + " " + x[4])
-                print(last_date)
-                with sql.connect(db_file) as sql_conn:
-                    sql_conn.execute(q, (x[0], x[1], x[2], (x[3] + " " + x[4])))
+        #else: #changeing else into a for loop
+        for conn in client_list:
+            conn.settimeout(1)
+            print('Connection established via: ', addr)
+            #print('Connection established via: ', conn.getsockname()) --> why different port?
+            try:
+                data = conn.recv(BUFFSIZE)
+                data = data.decode() #decoding into string from bites
+            except socket.timeout:
+                print("no data")
+            except:
+                print("disconnect")
+                client_list.remove(conn)
+                conn.close()
+                break
+            else:
+                if data:
+                    #data = data.decode()
+                    print(data)
+            #if not data:
+                #print("No data")
+
+            conn.send(data.encode())
+            x = data.split()
+            #print(x)
+            #print(client_list)
+            id = (x[0])
+            alarm1 = (x[1])
+            alarm2 = (x[2])
+            last_date = (x[3] + " " + x[4])
+            #print(last_date)
+            with sql.connect(db_file) as sql_conn:
+                sql_conn.execute(q, (x[0], x[1], x[2], (x[3] + " " + x[4])))
 
 
 
