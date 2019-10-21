@@ -28,12 +28,12 @@ insert or replace into station_status
 values (?, ?, ?, ?)
 """
 
-# check if database exists, if not create it
+HOST = ''           # Any IP can connect to server
+PORT = 54322        # Port to listen on
+
+# connect into sql_db_file (check if database exists, if not create it)
 with sql.connect(db_file) as sql_conn:
     sql_conn.execute(sql_create_table_water_station)
-
-HOST = ''  # Standard loopback interface address (localhost)
-PORT = 54322        # Port to listen on
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))

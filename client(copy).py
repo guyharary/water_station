@@ -16,15 +16,14 @@ with open("station_status.txt") as f:
 HOST = '127.0.0.1'          # The server's hostname or IP address
 PORT = 54322       # The port used by the server
 
-while True:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        while True:
-            s.send(' '.join(content).encode())
-            data = s.recv(1024)
-            data = data.decode()
-            print('Received', repr(data))
-            #time.sleep(2)
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((HOST, PORT))
+    while True:
+        s.send(' '.join(content).encode())
+        data = s.recv(1024)
+        data = data.decode()
+        print('Received', repr(data))
+        time.sleep(2)
         #input()
 
 
