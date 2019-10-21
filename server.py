@@ -43,6 +43,11 @@ def receive_message(client_socket):
         print(f"data: {data_as_string}")
 
         return data_as_string
+
+    except KeyboardInterrupt:
+        print('Shutting down server..')
+        exit(1)
+
     except socket.timeout:
         pass
 
@@ -65,6 +70,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             sockets[conn] = addr
 
             print(f'Connection established via: {sockets[conn]}')
+
+        except KeyboardInterrupt:
+            print('Shutting down server..')
+            exit(1)
 
         except:
             pass

@@ -31,5 +31,9 @@ while True:
                 data = data.decode()
                 print('Received', repr(data))
 
+    except KeyboardInterrupt:
+        print('Fuck you, bye..')
+        exit(1)
+
     except:
         pass
