@@ -7,7 +7,7 @@ import time
 
 
 # DATA
-BUFFSIZE = 2048
+BUFFSIZE = 1024
 
 
 # SQL_QUERYIES
@@ -28,50 +28,81 @@ insert or replace into station_status
 values (?, ?, ?, ?)
 """
 
-# check if database exists, if not create it
-with sql.connect(db_file) as conn:
-    conn.execute(sql_create_table_water_station)
+HOST = '0.0.0.0'          # Any IP can connect to server
+PORT = 8888               # Port to listen on
 
+# connect into sql_db_file (check if database exists, if not create it)
+with sql.connect(db_file) as sql_conn:
+    sql_conn.execute(sql_create_table_water_station)
 
+def receive_message(client_socket):
+    try:
+        data_as_bytes = conn.recv(BUFFSIZE)
+        data_as_string = data_as_bytes.decode()
 
-HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
-PORT = 54321        # Port to listen on
+        print(f"data: {data_as_string}")
+
+        return data_as_string
+
+    except KeyboardInterrupt:
+        print('Shutting down server..')
+        exit(1)
+
+    except socket.timeout:
+        pass
+
+    except:
+        return False
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     s.listen(5)
+    s.settimeout(3)
+
+    sockets = {}
     print("Waiting for connection...")
 
-    conn, addr = s.accept()
-    with conn:
-        print('Connection established via: ', addr)
-        while True:
-            time.sleep(3)
-            data = conn.recv(BUFFSIZE)
-            data = data.decode()
-            print(data)
-            if not data:
-                s.listen()
-                print("No data")
-            # socket.setblocking(False) --> trying to keep the loop alive without exiting.
-            conn.sendall(data.encode())
-            x = data.split()
-            id = (x[0])
-            alarm1 = (x[1])
-            alarm2 = (x[2])
-            last_date = (x[3] + " " + x[4])
-            print(last_date)
+    while True:
+        try:
+            conn, addr = s.accept()
 
-            with sql.connect(db_file) as conn:
-                conn.execute(q, (x[0], x[1], x[2], (x[3] + " " + x[4])))
+            conn.settimeout(1)
+            sockets[conn] = addr
 
+            print(f'Connection established via: {sockets[conn]}')
 
+        except KeyboardInterrupt:
+            print('Shutting down server..')
+            exit(1)
 
+        except:
+            pass
 
+        closed_sockets = []
+        for conn in sockets.keys():
+            msg = receive_message(conn)
+            if not msg:
+                print(f"{sockets[conn]} disconnected")
+                closed_sockets.append(conn)
+                conn.close()
 
+            else:
+                print(f'Received {msg} from {sockets[conn]}')
 
+                conn.send(msg.encode())
+                x = msg.split()
+                #print(x)
+                #print(client_list)
+                id = (x[0])
+                alarm1 = (x[1])
+                alarm2 = (x[2])
+                last_date = (x[3] + " " + x[4])
+                #print(last_date)
+                with sql.connect(db_file) as sql_conn:
+                    sql_conn.execute(q, (x[0], x[1], x[2], (x[3] + " " + x[4])))
 
-
+        for conn in closed_sockets:
+            del sockets[conn]
 
 #EXTRA HELP:
 
